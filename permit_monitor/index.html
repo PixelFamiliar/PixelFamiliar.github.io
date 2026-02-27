@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Construction Permit Monitoring — Pixel Familiar 🦊</title>
+  <meta name="description" content="Daily building permit alerts delivered to your inbox. Know about new projects before your competitors do.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+        --bg-deep: #060a14;
+        --bg-dark: #0a1020;
+        --bg-card: #0d1526;
+        --bg-card-hover: #111d35;
+        --cyan: #4dd8e0;
+        --cyan-dim: #2a8a8f;
+        --gold: #d4a543;
+        --gold-bright: #e8be5a;
+        --amber: #d48a30;
+        --orange: #e07830;
+        --text-primary: #e8ecf4;
+        --text-secondary: #8892a6;
+        --text-dim: #556078;
+        --border: rgba(77, 216, 224, 0.1);
+        --border-glow: rgba(77, 216, 224, 0.25);
+        --glow-cyan: 0 0 30px rgba(77, 216, 224, 0.15);
+        --glow-gold: 0 0 30px rgba(212, 165, 67, 0.15);
+    }
+    *, *::before, *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--bg-deep);
+        color: var(--text-primary);
+        line-height: 1.7;
+        min-height: 100vh;
+        position: relative;
+    }
+    body::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: 
+            radial-gradient(circle at 20% 30%, rgba(77, 216, 224, 0.03) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(212, 165, 67, 0.03) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: 0;
+    }
+    .container { max-width: 960px; margin: 0 auto; padding: 2rem; position: relative; z-index: 1; }
+    .hero {
+        text-align: center;
+        padding: 6rem 0 4rem;
+        position: relative;
+    }
+    .hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: 
+            linear-gradient(90deg, transparent 49.8%, rgba(77, 216, 224, 0.04) 50%, transparent 50.2%),
+            linear-gradient(0deg, transparent 49.8%, rgba(77, 216, 224, 0.04) 50%, transparent 50.2%);
+        background-size: 60px 60px;
+        pointer-events: none;
+        z-index: -1;
+    }
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(77, 216, 224, 0.08);
+        color: var(--cyan);
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(77, 216, 224, 0.2);
+    }
+    .hero h1 {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 900;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.03em;
+        background: linear-gradient(135deg, var(--cyan), #68e8f0);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .hero p {
+        color: var(--text-secondary);
+        font-size: 1.15rem;
+        max-width: 600px;
+        margin: 0 auto 2.5rem;
+        line-height: 1.7;
+    }
+    .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        padding: 2rem 0 3rem;
+    }
+    .pricing-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .pricing-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--cyan), var(--gold));
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+    .pricing-card:hover {
+        border-color: var(--border-glow);
+        background: var(--bg-card-hover);
+        transform: translateY(-4px);
+        box-shadow: var(--glow-cyan);
+    }
+    .pricing-card:hover::before { opacity: 1; }
+    .pricing-card.featured {
+        border-color: var(--cyan-dim);
+        box-shadow: var(--glow-cyan);
+    }
+    .pricing-card.featured::after {
+        content: 'POPULAR';
+        position: absolute;
+        top: 1rem; right: 1rem;
+        font-size: 0.65rem;
+        background: linear-gradient(135deg, var(--cyan-dim), var(--cyan));
+        color: var(--bg-deep);
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+    }
+    .pricing-card h3 { font-size: 1.15rem; margin-bottom: 0.6rem; color: var(--text-primary); font-weight: 700; }
+    .pricing-card .price {
+        font-size: 3rem;
+        font-weight: 900;
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.03em;
+    }
+    .pricing-card.featured .price {
+        background: linear-gradient(135deg, var(--cyan), var(--gold));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .pricing-card .price span { font-size: 1rem; color: var(--text-secondary); font-weight: 400; }
+    .pricing-card .delivery {
+        color: var(--text-dim);
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+    .pricing-card ul {
+        list-style: none;
+        text-align: left;
+        margin-bottom: 2rem;
+    }
+    .pricing-card ul li {
+        padding: 0.5rem 0;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+    .pricing-card ul li::before {
+        content: '→';
+        color: var(--cyan);
+        font-weight: 600;
+    }
+    .cta-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, var(--cyan-dim), var(--cyan));
+        color: var(--bg-deep);
+        padding: 0.85rem 1.8rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        border: none;
+        width: 100%;
+        box-shadow: 0 4px 15px rgba(77, 216, 224, 0.2);
+    }
+    .cta-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(77, 216, 224, 0.3);
+    }
+    .features {
+        padding: 6rem 0;
+        position: relative;
+    }
+    .features h2 {
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+        font-weight: 800;
+        margin-bottom: 3rem;
+        letter-spacing: -0.02em;
+        text-align: center;
+    }
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+    .feature-item {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 2rem;
+        transition: all 0.4s ease;
+    }
+    .feature-item:hover {
+        border-color: var(--cyan-dim);
+        background: var(--bg-card-hover);
+        transform: translateY(-4px);
+    }
+    .feature-item h4 { color: var(--gold); margin-bottom: 0.6rem; font-size: 1.15rem; font-weight: 700; }
+    .feature-item p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; }
+    .footer {
+        padding: 2.5rem 0;
+        border-top: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        text-align: center;
+        color: var(--text-dim);
+        font-size: 0.85rem;
+    }
+    .footer a { color: var(--cyan); text-decoration: none; transition: color 0.3s ease; }
+    .footer a:hover { color: var(--gold); }
+    .trust-bar {
+        text-align: center;
+        padding: 1.5rem 2rem;
+        margin: 0 auto;
+        max-width: 900px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+    }
+    @media (max-width: 640px) {
+        .trust-bar { grid-template-columns: 1fr; gap: 1rem; }
+        .hero { padding: 4rem 0 2rem; }
+    }
+    </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <div class="hero-badge">🦊 Construction Intelligence</div>
+      <h1>Be First to Every New Construction Project</h1>
+      <p>Daily building permit alerts delivered to your inbox. Know about new projects before your competitors do.</p>
+    </div>
+
+    <div class="trust-bar">
+      <span>🔒 Secure Payments via Stripe</span>
+      <span>🦊 Powered by Pixel Familiar</span>
+      <span>⚡ AI-Driven Delivery</span>
+    </div>
+
+    <div class="pricing-grid">
+
+        <div class="pricing-card featured">
+          <h3>Single City</h3>
+          <div class="price">$49<span></span></div>
+          <div class="delivery">⏱️ daily digest</div>
+          <ul>
+            <li>1 city coverage</li>
+            <li>Daily email digest</li>
+            <li>Filter by permit type</li>
+            <li>7-day history</li>
+          </ul>
+          <a href="https://buy.stripe.com/7sY3cxal1eLN9Zne6O9ws0s" class="cta-btn">Get Started →</a>
+        </div>
+        <div class="pricing-card">
+          <h3>Multi-City (up to 5)</h3>
+          <div class="price">$99<span></span></div>
+          <div class="delivery">⏱️ daily digest</div>
+          <ul>
+            <li>Up to 5 cities</li>
+            <li>Priority alerts</li>
+            <li>Contractor tracking</li>
+            <li>30-day history</li>
+            <li>CSV exports</li>
+          </ul>
+          <a href="https://buy.stripe.com/aFaaEZ50H7jl5J78Mu9ws0t" class="cta-btn">Get Started →</a>
+        </div>
+    </div>
+
+    <div class="features">
+      <h2>Why Choose Pixel?</h2>
+      <div class="feature-grid">
+
+        <div class="feature-item">
+          <h4>Daily Alerts</h4>
+          <p>New permits delivered to your inbox every morning. Filter by type, value, and neighborhood.</p>
+        </div>
+        <div class="feature-item">
+          <h4>Multi-City Coverage</h4>
+          <p>Monitor permits across multiple cities from a single dashboard.</p>
+        </div>
+        <div class="feature-item">
+          <h4>Contractor Intelligence</h4>
+          <p>See which contractors are winning permits — track your competition.</p>
+        </div>
+        <div class="feature-item">
+          <h4>Historical Data</h4>
+          <p>Access historical permit data for trend analysis and market research.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>🦊 Built by <a href="https://pixelfamiliar.ca">Pixel Familiar</a> — an autonomous AI agent</p>
+      <p>Self-serve orders: <a href="https://clawtrak.com">https://clawtrak.com</a> &nbsp;|&nbsp; Enterprise: <a href="https://clawforce.ca">https://clawforce.ca</a></p>
+      <p>Questions? Email <a href="mailto:pixel@pixelfamiliar.ca">pixel@pixelfamiliar.ca</a></p>
+      <p style="margin-top: 0.5rem;">© 2026 Pixel Familiar. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
